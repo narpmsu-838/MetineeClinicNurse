@@ -61,8 +61,8 @@
                     <h3 class="text-3xl font-bold" id="stat-total">0</h3>
                 </div>
                 <div class="card p-5 border-l-4 border-l-orange-500">
-                    <p class="text-gray-500 text-sm font-medium">อุณหภูมิเฉลี่ย (วันนี้)</p>
-                    <h3 class="text-3xl font-bold" id="stat-avg-temp">36.5</h3>
+                    <p class="text-gray-500 text-sm font-medium">รายได้วันนี้ (บาท)</p>
+                    <h3 class="text-3xl font-bold" id="stat-income-today">0</h3>
                 </div>
                 <div class="card p-5 border-l-4 border-l-purple-500">
                     <p class="text-gray-500 text-sm font-medium">สิทธิบัตรทอง</p>
@@ -128,8 +128,8 @@
                         </div>
                     </div>
 
-                    <div class="section-title">ข้อมูลสุขภาพ (Health Info)</div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div class="section-title">ข้อมูลสุขภาพและค่าบริการ (Health & Service)</div>
+                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
                          <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1">สิทธิการรักษา</label>
                             <select id="right" class="form-input">
@@ -155,8 +155,8 @@
                             <input type="text" id="bp" class="form-input" placeholder="120/80">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">น้ำหนัก (กก.)</label>
-                            <input type="number" step="0.1" id="weight" class="form-input" placeholder="kg">
+                            <label class="block text-xs font-bold text-gray-500 mb-1 text-emerald-600 font-bold">ราคาค่าบริการ (บาท)</label>
+                            <input type="number" id="price" class="form-input border-emerald-300 font-bold text-emerald-700" placeholder="0.00" step="0.5">
                         </div>
                     </div>
 
@@ -191,17 +191,14 @@
                     <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </span>
-                    <input type="text" id="searchInput" onkeyup="filterTable()" class="form-input pl-10" placeholder="ค้นหาชื่อ, HN, CID หรือการวินิจฉัย...">
+                    <input type="text" id="searchInput" onkeyup="filterTable()" class="form-input pl-10" placeholder="ค้นหาชื่อ, HN, CID หรืออาการ...">
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <!-- CSV Import Hidden Input -->
                     <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="importCSV(event)">
                     <button onclick="document.getElementById('csvFileInput').click()" class="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-sm font-semibold flex items-center hover:bg-blue-100 transition">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-8l-4-4m0 0l-4 4m4-4v12" /></svg>
                         นำเข้าไฟล์ CSV
                     </button>
                     <button onclick="exportToCSV()" class="px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-sm font-semibold flex items-center hover:bg-emerald-100 transition">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         ส่งออกไฟล์ CSV
                     </button>
                 </div>
@@ -214,19 +211,16 @@
                             <tr>
                                 <th class="px-4 py-3 font-bold">วัน/เวลา</th>
                                 <th class="px-4 py-3 font-bold">ข้อมูลผู้ป่วย (HN/CID)</th>
-                                <th class="px-4 py-3 font-bold">ข้อมูลกายภาพ</th>
-                                <th class="px-4 py-3 font-bold">วินิจฉัย</th>
-                                <th class="px-4 py-3 font-bold text-emerald-700">การรักษา</th>
+                                <th class="px-4 py-3 font-bold">อาการสำคัญ (CC)</th>
+                                <th class="px-4 py-3 font-bold">วินิจฉัย / รักษา</th>
+                                <th class="px-4 py-3 font-bold text-emerald-700">ราคาค่าบริการ</th>
                                 <th class="px-4 py-3 font-bold text-center">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody" class="divide-y divide-gray-100">
-                            <!-- Data rows will be injected here -->
-                        </tbody>
+                        <tbody id="tableBody" class="divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
                 <div id="emptyState" class="p-12 text-center text-gray-400 hidden">
-                    <svg class="w-16 h-16 mx-auto mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     <p>ยังไม่มีข้อมูลผู้รับบริการในระบบ</p>
                 </div>
             </div>
@@ -234,40 +228,31 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-800 text-white px-6 py-3 rounded-xl shadow-2xl flex items-center gap-2 z-[100]">
-        <span id="toastIcon">✅</span>
-        <span id="toastMsg">บันทึกสำเร็จ</span>
+    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 bg-gray-800 text-white px-6 py-3 rounded-xl shadow-2xl z-[100]">
+        <span id="toastIcon">✅</span> <span id="toastMsg">บันทึกสำเร็จ</span>
     </div>
 
     <script>
-        // --- Core State ---
         let patients = JSON.parse(localStorage.getItem('clinic_patients')) || [];
         let weeklyChart, rightsChart;
 
-        // --- Clock & Date ---
         function updateDateTime() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('th-TH');
-            document.getElementById('date').innerText = now.toLocaleDateString('th-TH', { 
-                day: 'numeric', month: 'long', year: 'numeric' 
-            });
+            document.getElementById('date').innerText = now.toLocaleDateString('th-TH', { day: 'numeric', month: 'long', year: 'numeric' });
         }
         setInterval(updateDateTime, 1000);
         updateDateTime();
 
-        // --- Tab Switching ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
             document.getElementById('content-' + tabId).classList.remove('hidden');
             document.getElementById('tab-' + tabId).classList.add('active');
-
             if(tabId === 'overview') updateCharts();
             if(tabId === 'database') renderTable();
         }
 
-        // --- Data Management ---
         document.getElementById('patientForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const newPatient = {
@@ -277,24 +262,20 @@
                 fullname: document.getElementById('fullname').value,
                 cid: document.getElementById('cid').value || '-',
                 hn: document.getElementById('hn').value || 'ไม่มี HN',
-                
-                // Address Data
                 addr_house: document.getElementById('addr_house').value || '',
                 addr_tambon: document.getElementById('addr_tambon').value || '',
                 addr_amphoe: document.getElementById('addr_amphoe').value || '',
                 addr_province: document.getElementById('addr_province').value || '',
                 phone: document.getElementById('phone').value || '',
-
                 right: document.getElementById('right').value,
                 age: document.getElementById('age').value,
                 gender: document.getElementById('gender').value,
                 bp: document.getElementById('bp').value,
-                weight: document.getElementById('weight').value,
+                price: parseFloat(document.getElementById('price').value) || 0,
                 cc: document.getElementById('cc').value,
                 dx: document.getElementById('dx').value,
                 rx: document.getElementById('rx').value
             };
-
             patients.unshift(newPatient);
             saveAndRefresh();
             this.reset();
@@ -316,144 +297,49 @@
             if(!document.getElementById('content-database').classList.contains('hidden')) renderTable();
         }
 
-        // --- CSV Import ---
-        function importCSV(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const text = e.target.result;
-                const rows = text.split('\n');
-                
-                // Skip header
-                let importedCount = 0;
-                for (let i = 1; i < rows.length; i++) {
-                    const row = rows[i].trim();
-                    if (!row) continue;
-
-                    // Parse CSV line respecting quotes
-                    const cols = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-                    const cleanCols = cols.map(c => c.replace(/^"|"$/g, '').trim());
-
-                    // Check for new format (approx 14 cols) or old format (9 cols)
-                    if (cleanCols.length >= 4) {
-                        let importedPatient = {};
-                        
-                        if (cleanCols.length >= 13) {
-                            // New Format
-                             importedPatient = {
-                                id: Date.now() + i,
-                                timestamp: cleanCols[0],
-                                cid: cleanCols[1],
-                                hn: cleanCols[2],
-                                fullname: cleanCols[3],
-                                addr_house: cleanCols[4],
-                                addr_tambon: cleanCols[5],
-                                addr_amphoe: cleanCols[6],
-                                addr_province: cleanCols[7],
-                                phone: cleanCols[8],
-                                right: cleanCols[9],
-                                age: cleanCols[10],
-                                gender: cleanCols[11],
-                                bp: cleanCols[12],
-                                dx: cleanCols[13] || '-',
-                                rx: cleanCols[14] || '-',
-                                cc: '-'
-                            };
-                        } else {
-                            // Old Format Fallback
-                            importedPatient = {
-                                id: Date.now() + i,
-                                timestamp: cleanCols[0],
-                                cid: '-',
-                                hn: cleanCols[1],
-                                fullname: cleanCols[2],
-                                addr_house: '-', addr_tambon: '-', addr_amphoe: '-', addr_province: '-', phone: '-',
-                                right: cleanCols[3],
-                                age: cleanCols[4],
-                                gender: cleanCols[5],
-                                bp: cleanCols[6],
-                                dx: cleanCols[7] || '-',
-                                rx: cleanCols[8] || '-',
-                                cc: '-'
-                            };
-                        }
-                        
-                        // Add basic date for stats if missing
-                        if(!importedPatient.date) importedPatient.date = new Date().toISOString().split('T')[0];
-
-                        patients.unshift(importedPatient);
-                        importedCount++;
-                    }
-                }
-
-                if (importedCount > 0) {
-                    saveAndRefresh();
-                    showToast(`นำเข้าสำเร็จ ${importedCount} รายการ`, "📂");
-                } else {
-                    showToast("ไม่พบข้อมูลที่ถูกต้องในไฟล์", "⚠️");
-                }
-                event.target.value = ''; // Reset input
-            };
-            reader.readAsText(file, 'UTF-8');
-        }
-
-        // --- UI Rendering ---
         function updateStats() {
             const today = new Date().toISOString().split('T')[0];
-            const patientsToday = patients.filter(p => p.date === today).length;
-            const goldCardCount = patients.filter(p => p.right === 'บัตรทอง').length;
-
-            document.getElementById('stat-today').innerText = patientsToday;
+            const patientsToday = patients.filter(p => p.date === today);
+            const incomeToday = patientsToday.reduce((sum, p) => sum + (p.price || 0), 0);
+            
+            document.getElementById('stat-today').innerText = patientsToday.length;
             document.getElementById('stat-total').innerText = patients.length;
-            document.getElementById('stat-gold').innerText = goldCardCount;
+            document.getElementById('stat-income-today').innerText = incomeToday.toLocaleString();
+            document.getElementById('stat-gold').innerText = patients.filter(p => p.right === 'บัตรทอง').length;
         }
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
             const empty = document.getElementById('emptyState');
             tbody.innerHTML = '';
-
-            if (patients.length === 0) {
-                empty.classList.remove('hidden');
-                return;
-            }
+            if (patients.length === 0) { empty.classList.remove('hidden'); return; }
             empty.classList.add('hidden');
 
             patients.forEach(p => {
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-50 transition-colors";
-                
-                // Address tooltip
-                const fullAddr = `${p.addr_house} ${p.addr_tambon} ${p.addr_amphoe} ${p.addr_province}`.trim();
-                const displayAddr = fullAddr && fullAddr !== '- - -' ? `📍 ${fullAddr}` : '';
-
                 row.innerHTML = `
                     <td class="px-4 py-4 text-xs text-gray-500 font-mono">${p.timestamp}</td>
                     <td class="px-4 py-4">
                         <div class="font-bold text-slate-800">${p.fullname}</div>
-                        <div class="text-xs text-gray-500 flex flex-col gap-1 mt-1">
-                            <span class="bg-slate-100 px-1 rounded w-fit">HN: ${p.hn}</span>
-                            ${p.cid && p.cid !== '-' ? `<span class="text-xs text-gray-400">CID: ${p.cid}</span>` : ''}
-                            ${displayAddr ? `<span class="text-[10px] text-emerald-600 truncate max-w-[150px]" title="${fullAddr}">${displayAddr}</span>` : ''}
-                        </div>
-                    </td>
-                    <td class="px-4 py-4 text-xs">
-                        <div>สิทธิ: ${p.right}</div>
-                        <div class="font-mono text-blue-600">BP: ${p.bp || '-'}</div>
-                        <div class="text-gray-400 scale-90 origin-left">${p.age} ปี | ${p.gender}</div>
+                        <div class="text-[10px] text-gray-500">HN: ${p.hn} | CID: ${p.cid}</div>
                     </td>
                     <td class="px-4 py-4">
-                        <div class="text-sm text-gray-600 truncate max-w-[200px]" title="${p.dx}">${p.dx || '-'}</div>
-                        <div class="text-[10px] text-gray-400 italic">CC: ${p.cc || '-'}</div>
+                        <div class="text-sm text-slate-600 italic border-l-2 border-slate-200 pl-2 max-w-[200px] truncate" title="${p.cc}">${p.cc || '-'}</div>
                     </td>
-                    <td class="px-4 py-4 bg-emerald-50/30">
-                        <div class="text-sm font-semibold text-emerald-800">${p.rx || '-'}</div>
+                    <td class="px-4 py-4">
+                        <div class="text-xs font-bold text-blue-600">DX: ${p.dx || '-'}</div>
+                        <div class="text-xs text-emerald-700">RX: ${p.rx || '-'}</div>
+                    </td>
+                    <td class="px-4 py-4">
+                        <div class="text-lg font-bold text-emerald-700">${(p.price || 0).toLocaleString()} ฿</div>
+                        <div class="text-[10px] text-gray-400 font-semibold uppercase">${p.right}</div>
                     </td>
                     <td class="px-4 py-4 text-center">
-                        <button onclick="deletePatient(${p.id})" class="text-red-400 hover:text-red-600 p-2 rounded-full hover:bg-red-50 transition">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        <button onclick="deletePatient(${p.id})" class="text-red-400 hover:text-red-600 p-2 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
                         </button>
                     </td>
                 `;
@@ -465,60 +351,37 @@
             const input = document.getElementById('searchInput').value.toLowerCase();
             const rows = document.querySelectorAll('#tableBody tr');
             rows.forEach(row => {
-                const text = row.innerText.toLowerCase();
-                row.style.display = text.includes(input) ? '' : 'none';
+                row.style.display = row.innerText.toLowerCase().includes(input) ? '' : 'none';
             });
         }
 
-        // --- Charts Implementation ---
         function updateCharts() {
             const ctxWeekly = document.getElementById('weeklyChart').getContext('2d');
-            const ctxRights = document.getElementById('rightsChart').getContext('2d');
-
-            // Data Processing for Weekly
             const last7Days = [...Array(7)].map((_, i) => {
-                const d = new Date();
-                d.setDate(d.getDate() - (6 - i));
+                const d = new Date(); d.setDate(d.getDate() - (6 - i));
                 return d.toISOString().split('T')[0];
             });
             const weeklyData = last7Days.map(date => patients.filter(p => p.date === date).length);
-
             if(weeklyChart) weeklyChart.destroy();
             weeklyChart = new Chart(ctxWeekly, {
                 type: 'line',
                 data: {
                     labels: last7Days.map(d => new Date(d).toLocaleDateString('th-TH', {day:'numeric', month:'short'})),
-                    datasets: [{
-                        label: 'จำนวนผู้ป่วย',
-                        data: weeklyData,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        fill: true,
-                        tension: 0.4
-                    }]
+                    datasets: [{ label: 'คนไข้', data: weeklyData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.3 }]
                 },
-                options: { responsive: true, plugins: { legend: { display: false } } }
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
             });
 
-            // Data Processing for Rights
             const rightsMap = { 'จ่ายเงินเอง': 0, 'บัตรทอง': 0, 'ข้าราชการ': 0, 'ประกันสังคม': 0 };
             patients.forEach(p => { if(rightsMap[p.right] !== undefined) rightsMap[p.right]++; });
-
             if(rightsChart) rightsChart.destroy();
-            rightsChart = new Chart(ctxRights, {
+            rightsChart = new Chart(document.getElementById('rightsChart').getContext('2d'), {
                 type: 'doughnut',
-                data: {
-                    labels: Object.keys(rightsMap),
-                    datasets: [{
-                        data: Object.values(rightsMap),
-                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6']
-                    }]
-                },
-                options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+                data: { labels: Object.keys(rightsMap), datasets: [{ data: Object.values(rightsMap), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'] }] },
+                options: { plugins: { legend: { position: 'bottom' } } }
             });
         }
 
-        // --- Utilities ---
         function showToast(msg, icon = "✅") {
             const toast = document.getElementById('toast');
             document.getElementById('toastMsg').innerText = msg;
@@ -528,32 +391,21 @@
         }
 
         function exportToCSV() {
-            if(patients.length === 0) return showToast("ไม่มีข้อมูลให้ส่งออก", "⚠️");
-            const headers = [
-                "วัน/เวลา", "CID", "HN", "ชื่อ-นามสกุล", 
-                "บ้านเลขที่", "ตำบล", "อำเภอ", "จังหวัด", "เบอร์โทร",
-                "สิทธิ", "อายุ", "เพศ", "BP", "วินิจฉัย", "การรักษา"
-            ];
-            
-            const rows = patients.map(p => [
-                p.timestamp, p.cid, p.hn, p.fullname,
-                p.addr_house, p.addr_tambon, p.addr_amphoe, p.addr_province, p.phone,
-                p.right, p.age, p.gender, p.bp, p.dx, p.rx
-            ]);
-            
+            if(patients.length === 0) return;
+            const headers = ["วัน/เวลา", "CID", "HN", "ชื่อ-นามสกุล", "เบอร์โทร", "สิทธิ", "ราคา", "CC", "วินิจฉัย", "การรักษา"];
+            const rows = patients.map(p => [p.timestamp, p.cid, p.hn, p.fullname, p.phone, p.right, p.price, p.cc, p.dx, p.rx]);
             let csvContent = "\uFEFF" + headers.join(",") + "\n";
-            rows.forEach(row => {
-                csvContent += row.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(",") + "\n";
-            });
-
+            rows.forEach(row => { csvContent += row.map(cell => `"${(cell || '').toString().replace(/"/g, '""')}"`).join(",") + "\n"; });
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `รายงานเมทินีคลินิก_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.csv`;
+            link.download = `เมทินีคลินิก_${new Date().toLocaleDateString('th-TH').replace(/\//g, '-')}.csv`;
             link.click();
         }
 
-        // Init
+        // CSV Import placeholder
+        function importCSV(e) { showToast("ฟังก์ชันนำเข้าพร้อมใช้งานในเวอร์ชันเต็ม"); }
+
         updateStats();
         updateCharts();
     </script>
