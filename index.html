@@ -3,335 +3,466 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เมทินีคลินิก Dashboard & Data Management</title>
+    <title>เมทินีคลินิก Dashboard & Inventory</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .card { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; transition: transform 0.2s; }
+        .card { background: white; border-radius: 1rem; border: 1px solid #e2e8f0; transition: all 0.2s; }
         .gradient-header { background: linear-gradient(135deg, #059669 0%, #10b981 100%); }
-        .btn-primary { background-color: #10b981; color: white; padding: 0.5rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; cursor: pointer; }
+        .btn-primary { background-color: #10b981; color: white; padding: 0.5rem 1.5rem; border-radius: 0.5rem; font-weight: 600; transition: all 0.2s; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
         .btn-primary:hover { background-color: #059669; transform: translateY(-1px); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
         .form-input { border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 0.5rem 0.75rem; width: 100%; font-size: 0.875rem; transition: border-color 0.2s; }
-        .form-input:focus { border-color: #10b981; outline: none; ring: 2px ring-emerald-100; }
-        .section-title { border-left: 4px solid #10b981; padding-left: 0.75rem; color: #065f46; font-weight: bold; margin: 1.5rem 0 1rem 0; }
+        .form-input:focus { border-color: #10b981; outline: none; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1); }
+        .section-title { border-left: 4px solid #10b981; padding-left: 0.75rem; color: #065f46; font-weight: bold; margin: 1.5rem 0 1rem 0; display: flex; justify-content: space-between; align-items: center; }
         .table-header { background-color: #f1f5f9; text-transform: uppercase; font-size: 0.75rem; color: #64748b; }
-        .tab-btn { padding: 0.75rem 1.5rem; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; }
-        .tab-btn.active { color: #10b981; border-bottom-color: #10b981; }
+        .tab-btn { padding: 1rem 1.5rem; font-weight: 600; color: #64748b; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn.active { color: #10b981; border-bottom-color: #10b981; background-color: rgba(16, 185, 129, 0.05); }
         
-        /* สไตล์สำหรับบัตรข้อมูลที่จะ Export (รวบรวมข้อมูลทั้งหมด) */
+        /* Export Card Styling (Hidden) */
         #exportCard {
             width: 800px;
             padding: 50px;
             background: white;
-            border: 1px solid #e2e8f0;
             position: fixed;
-            left: -9999px; /* ซ่อนจากหน้าจอหลัก */
+            left: -9999px;
+            top: 0;
+            z-index: -100;
         }
+
+        .badge-low { background-color: #fee2e2; color: #ef4444; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: bold; }
+        .badge-ok { background-color: #dcfce7; color: #16a34a; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.7rem; font-weight: bold; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen">
-    <div class="max-w-[1400px] mx-auto p-4 md:p-6">
-        <header class="gradient-header rounded-2xl p-6 text-white mb-6 shadow-md flex flex-col md:flex-row justify-between items-center">
+    <div class="max-w-[1440px] mx-auto p-4 md:p-6">
+        <!-- Header -->
+        <header class="gradient-header rounded-2xl p-6 text-white mb-6 shadow-lg flex flex-col md:flex-row justify-between items-center border-b-4 border-emerald-700">
             <div class="flex items-center gap-4">
-                <div class="bg-white/20 p-3 rounded-full">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="bg-white/20 p-3 rounded-2xl backdrop-blur-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold">เมทินีคลินิกการพยาบาล เลขที่ใบอนุญาต</h1>
-                    <p class="text-emerald-50 text-sm">Dashboard บริหารจัดการข้อมูลผู้รับบริการ</p>
+                    <h1 class="text-2xl md:text-3xl font-bold tracking-tight">เมทินีคลินิกการพยาบาล เลขที่ใบอนุญาตที่ xxxxx</h1>
+                    <p class="text-emerald-100 text-sm flex items-center gap-2">
+                        <span class="w-2 h-2 bg-emerald-300 rounded-full animate-pulse"></span>
+                        ระบบบริหารจัดการข้อมูลและคลังยาอัจฉริยะ
+                    </p>
                 </div>
             </div>
-            <div class="mt-4 md:mt-0 text-center md:text-right">
-                <div id="clock" class="text-xl font-mono font-bold">00:00:00</div>
-                <div id="date" class="text-sm opacity-90">1 มกราคม 2567</div>
+            <div class="mt-4 md:mt-0 text-center md:text-right bg-black/10 p-3 rounded-xl">
+                <div id="clock" class="text-2xl font-mono font-bold tracking-tighter">00:00:00</div>
+                <div id="date" class="text-xs opacity-80 font-medium">1 มกราคม 2567</div>
             </div>
         </header>
 
-        <div class="flex border-b border-gray-200 mb-6 overflow-x-auto bg-white rounded-t-xl px-4">
-            <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active">ภาพรวม (Overview)</button>
-            <button onclick="switchTab('entry')" id="tab-entry" class="tab-btn">ลงทะเบียนผู้ป่วยใหม่</button>
-            <button onclick="switchTab('database')" id="tab-database" class="tab-btn">ฐานข้อมูลผู้ป่วย</button>
-        </div>
+        <!-- Navigation Tabs -->
+        <nav class="flex border-b border-gray-200 mb-6 overflow-x-auto bg-white rounded-t-2xl px-4 shadow-sm sticky top-0 z-40">
+            <button onclick="switchTab('overview')" id="tab-overview" class="tab-btn active flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                ภาพรวม
+            </button>
+            <button onclick="switchTab('entry')" id="tab-entry" class="tab-btn flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                ลงทะเบียนผู้ป่วย
+            </button>
+            <button onclick="switchTab('database')" id="tab-database" class="tab-btn flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                ประวัติการรักษา
+            </button>
+            <button onclick="switchTab('inventory')" id="tab-inventory" class="tab-btn flex items-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                คลังยาและเวชภัณฑ์
+            </button>
+        </nav>
 
-        <!-- Content Overview -->
+        <!-- Content: Overview -->
         <div id="content-overview" class="tab-content space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="card p-5 border-l-4 border-l-emerald-500">
-                    <p class="text-gray-500 text-sm font-medium">ผู้รับบริการวันนี้</p>
-                    <h3 class="text-3xl font-bold" id="stat-today">0</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="card p-6 border-l-4 border-l-emerald-500 shadow-sm">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">ผู้รับบริการวันนี้</p>
+                    <div class="flex items-end justify-between">
+                        <h3 class="text-4xl font-black text-slate-800" id="stat-today">0</h3>
+                        <span class="text-emerald-500 text-xs font-bold bg-emerald-50 px-2 py-1 rounded-lg">ราย</span>
+                    </div>
                 </div>
-                <div class="card p-5 border-l-4 border-l-blue-500">
-                    <p class="text-gray-500 text-sm font-medium">ผู้รับบริการทั้งหมด</p>
-                    <h3 class="text-3xl font-bold" id="stat-total">0</h3>
+                <div class="card p-6 border-l-4 border-l-blue-500 shadow-sm">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">รายได้วันนี้</p>
+                    <div class="flex items-end justify-between">
+                        <h3 class="text-4xl font-black text-slate-800" id="stat-income-today">0</h3>
+                        <span class="text-blue-500 text-xs font-bold bg-blue-50 px-2 py-1 rounded-lg">บาท</span>
+                    </div>
                 </div>
-                <div class="card p-5 border-l-4 border-l-orange-500">
-                    <p class="text-gray-500 text-sm font-medium">รายได้วันนี้ (บาท)</p>
-                    <h3 class="text-3xl font-bold" id="stat-income-today">0</h3>
+                <div class="card p-6 border-l-4 border-l-orange-500 shadow-sm">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">ยาที่ต้องเติม</p>
+                    <div class="flex items-end justify-between">
+                        <h3 class="text-4xl font-black text-slate-800" id="stat-low-stock">0</h3>
+                        <span class="text-orange-500 text-xs font-bold bg-orange-50 px-2 py-1 rounded-lg">รายการ</span>
+                    </div>
                 </div>
-                <div class="card p-5 border-l-4 border-l-purple-500">
-                    <p class="text-gray-500 text-sm font-medium">สิทธิบัตรทอง</p>
-                    <h3 class="text-3xl font-bold" id="stat-gold">0</h3>
+                <div class="card p-6 border-l-4 border-l-purple-500 shadow-sm">
+                    <p class="text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">มูลค่าคลังยา</p>
+                    <div class="flex items-end justify-between">
+                        <h3 class="text-4xl font-black text-slate-800" id="stat-inventory-val">0</h3>
+                        <span class="text-purple-500 text-xs font-bold bg-purple-50 px-2 py-1 rounded-lg">บาท</span>
+                    </div>
                 </div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="card p-6">
-                    <h4 class="font-bold text-gray-700 mb-4">สถิติผู้รับบริการ (7 วันย้อนหลัง)</h4>
-                    <canvas id="weeklyChart" height="200"></canvas>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="card p-6 lg:col-span-2">
+                    <h4 class="font-bold text-slate-700 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+                        แนวโน้มผู้รับบริการ (7 วันย้อนหลัง)
+                    </h4>
+                    <canvas id="weeklyChart" height="120"></canvas>
                 </div>
                 <div class="card p-6">
-                    <h4 class="font-bold text-gray-700 mb-4">สัดส่วนสิทธิการรักษา</h4>
-                    <div class="max-w-[300px] mx-auto">
+                    <h4 class="font-bold text-slate-700 mb-4">สัดส่วนสิทธิการรักษา</h4>
+                    <div class="max-w-[240px] mx-auto">
                         <canvas id="rightsChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Content Entry -->
+        <!-- Content: Entry -->
         <div id="content-entry" class="tab-content hidden">
-            <div class="card p-6 shadow-sm">
-                <form id="patientForm" class="space-y-4">
-                    <div class="section-title">ข้อมูลทั่วไป (General Info)</div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="card p-8 shadow-md border-t-4 border-t-emerald-500">
+                <form id="patientForm" class="space-y-6">
+                    <div class="section-title">
+                        <span>1. ข้อมูลทั่วไปและช่องทางติดต่อ</span>
+                        <span class="text-xs font-normal text-slate-400">ระบุข้อมูลให้ครบถ้วนเพื่อความถูกต้องของระเบียน</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-5">
                         <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-500 mb-1">ชื่อ-นามสกุล</label>
-                            <input type="text" id="fullname" class="form-input" placeholder="ระบุชื่อ-นามสกุล" required>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">ชื่อ-นามสกุลผู้ป่วย</label>
+                            <input type="text" id="fullname" class="form-input" placeholder="ตัวอย่าง: นายใจดี มีสุข" required>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">เลขบัตรประชาชน (CID)</label>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">เลขบัตรประชาชน (CID)</label>
                             <input type="text" id="cid" class="form-input" placeholder="13 หลัก" maxlength="13">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">HN</label>
-                            <input type="text" id="hn" class="form-input" placeholder="เลขที่ผู้ป่วย">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5 uppercase">เลขที่บัตร (HN)</label>
+                            <input type="text" id="hn" class="form-input" placeholder="เว้นว่างหากไม่มี">
                         </div>
                     </div>
 
-                    <div class="section-title">ที่อยู่และข้อมูลติดต่อ (Address)</div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-500 mb-1">ที่อยู่ (บ้านเลขที่/หมู่บ้าน)</label>
-                            <input type="text" id="addr_house" class="form-input" placeholder="เช่น 123 ม.1 บ.หนองแวง">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-5">
+                        <div class="col-span-2 md:col-span-2">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">ที่อยู่ปัจจุบัน</label>
+                            <input type="text" id="addr_house" class="form-input" placeholder="บ้านเลขที่, หมู่, ซอย">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">ตำบล</label>
-                            <input type="text" id="addr_tambon" class="form-input" placeholder="ตำบล">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">ตำบล</label>
+                            <input type="text" id="addr_tambon" class="form-input">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">อำเภอ</label>
-                            <input type="text" id="addr_amphoe" class="form-input" placeholder="อำเภอ">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">อำเภอ</label>
+                            <input type="text" id="addr_amphoe" class="form-input">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">จังหวัด</label>
-                            <input type="text" id="addr_province" class="form-input" placeholder="จังหวัด">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">เบอร์โทรศัพท์</label>
-                            <input type="text" id="phone" class="form-input" placeholder="0xx-xxx-xxxx">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">จังหวัด</label>
+                            <input type="text" id="addr_province" class="form-input">
                         </div>
                     </div>
 
-                    <div class="section-title">ข้อมูลสุขภาพและค่าบริการ (Health & Service)</div>
-                    <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">สิทธิการรักษา</label>
+                    <div class="section-title">
+                        <span>2. การคัดกรองเบื้องต้นและสิทธิการรักษา</span>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-5">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">สิทธิการรักษา</label>
                             <select id="right" class="form-input">
                                 <option value="จ่ายเงินเอง">จ่ายเงินเอง</option>
-                                <option value="บัตรทอง">บัตรทอง</option>
-                                <option value="ข้าราชการ">ข้าราชการ</option>
+                                <option value="บัตรทอง">บัตรทอง (สปสช.)</option>
+                                <option value="ข้าราชการ">ข้าราชการ/รัฐวิสาหกิจ</option>
                                 <option value="ประกันสังคม">ประกันสังคม</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">อายุ</label>
-                            <input type="number" id="age" class="form-input" placeholder="ปี">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">อายุ (ปี)</label>
+                            <input type="number" id="age" class="form-input">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">เพศ</label>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">เพศ</label>
                             <select id="gender" class="form-input">
                                 <option value="ชาย">ชาย</option>
                                 <option value="หญิง">หญิง</option>
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">ความดัน (BP)</label>
-                            <input type="text" id="bp" class="form-input" placeholder="120/80">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">ความดันโลหิต (BP)</label>
+                            <input type="text" id="bp" class="form-input" placeholder="เช่น 120/80">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1 text-emerald-600 font-bold">ราคาค่าบริการ (บาท)</label>
-                            <input type="number" id="price" class="form-input border-emerald-300 font-bold text-emerald-700" placeholder="0.00" step="0.5">
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">เบอร์โทรศัพท์</label>
+                            <input type="text" id="phone" class="form-input" placeholder="0xx-xxxxxxx">
                         </div>
                     </div>
 
-                    <div class="section-title">การตรวจรักษา (Medical Record)</div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="section-title">
+                        <span>3. การตรวจรักษาและการจ่ายยา</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">อาการสำคัญ (CC)</label>
-                            <textarea id="cc" rows="3" class="form-input" placeholder="อาการที่มาวันนี้"></textarea>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">อาการสำคัญ (Chief Complaint)</label>
+                            <textarea id="cc" rows="4" class="form-input" placeholder="ระบุอาการสำคัญที่มาพบแพทย์..."></textarea>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">การวินิจฉัย (DX)</label>
-                            <textarea id="dx" rows="3" class="form-input" placeholder="ผลการวินิจฉัย"></textarea>
+                            <label class="block text-xs font-bold text-slate-500 mb-1.5">การวินิจฉัย (Diagnosis)</label>
+                            <textarea id="dx" rows="4" class="form-input" placeholder="สรุปผลการวินิจฉัย..."></textarea>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">การรักษา (RX)</label>
-                            <textarea id="rx" rows="3" class="form-input border-emerald-200" placeholder="ยาหรือหัตถการ"></textarea>
+                        <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-100">
+                            <label class="block text-xs font-bold text-emerald-700 mb-2 uppercase flex justify-between items-center">
+                                จ่ายยาจากคลัง
+                                <span class="text-[10px] bg-emerald-200 px-2 py-0.5 rounded">Auto-Stock</span>
+                            </label>
+                            <div id="med-selection-container" class="space-y-2 max-h-[120px] overflow-y-auto mb-3">
+                                <!-- Meds filled by JS -->
+                            </div>
+                            <div class="mt-2 border-t border-emerald-200 pt-3">
+                                <label class="block text-xs font-bold text-emerald-700 mb-1.5">ค่าบริการรวม (บาท)</label>
+                                <input type="number" id="price" class="form-input border-emerald-300 font-black text-lg text-emerald-700 bg-white" placeholder="0.00">
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex justify-end gap-3 pt-4">
-                        <button type="button" onclick="this.form.reset()" class="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">ล้างฟอร์ม</button>
-                        <button type="submit" class="btn-primary">บันทึกข้อมูล</button>
+                    <div class="flex justify-end gap-3 pt-6 border-t border-slate-100">
+                        <button type="button" onclick="this.form.reset()" class="px-8 py-2.5 text-slate-500 font-bold hover:bg-slate-50 rounded-xl transition">ล้างข้อมูล</button>
+                        <button type="submit" class="btn-primary px-10 py-3 shadow-lg shadow-emerald-200">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+                            บันทึกข้อมูลการรักษา
+                        </button>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Content Database -->
+        <!-- Content: Database -->
         <div id="content-database" class="tab-content hidden space-y-4">
-            <div class="flex flex-col md:flex-row justify-between gap-4">
-                <div class="relative flex-grow max-w-md">
-                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4 bg-white p-4 rounded-2xl shadow-sm">
+                <div class="relative w-full max-w-lg">
+                    <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
                         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     </span>
-                    <input type="text" id="searchInput" onkeyup="filterTable()" class="form-input pl-10" placeholder="ค้นหาชื่อ, HN, CID หรืออาการ...">
+                    <input type="text" id="searchInput" onkeyup="filterTable()" class="form-input pl-10 h-11" placeholder="ค้นหาชื่อ, HN, CID หรืออาการ...">
                 </div>
-                <button onclick="exportToCSV()" class="px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-sm font-semibold hover:bg-emerald-100 transition">
-                    ส่งออกไฟล์ CSV
-                </button>
+                <div class="flex gap-2 w-full md:w-auto">
+                    <button onclick="exportToCSV()" class="flex-1 md:flex-none px-5 py-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl text-sm font-bold hover:bg-slate-50 transition flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Export CSV
+                    </button>
+                </div>
             </div>
 
-            <div class="card overflow-hidden">
+            <div class="card overflow-hidden shadow-sm border-0">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse" id="patientTable">
                         <thead class="table-header">
                             <tr>
-                                <th class="px-4 py-3 font-bold text-xs">วัน/เวลา</th>
-                                <th class="px-4 py-3 font-bold text-xs">ข้อมูลผู้ป่วย</th>
-                                <th class="px-4 py-3 font-bold text-xs">อาการสำคัญ</th>
-                                <th class="px-4 py-3 font-bold text-xs">การวินิจฉัย/รักษา</th>
-                                <th class="px-4 py-3 font-bold text-xs text-emerald-700">ค่าบริการ</th>
-                                <th class="px-4 py-3 font-bold text-xs text-center">จัดการ</th>
+                                <th class="px-6 py-4 font-bold text-xs">วันเวลา / รายละเอียด</th>
+                                <th class="px-6 py-4 font-bold text-xs">ข้อมูลผู้รับบริการ</th>
+                                <th class="px-6 py-4 font-bold text-xs">อาการสำคัญ & วินิจฉัย</th>
+                                <th class="px-6 py-4 font-bold text-xs">สิทธิ / ค่าบริการ</th>
+                                <th class="px-6 py-4 font-bold text-xs text-center">จัดการ</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody" class="divide-y divide-gray-100"></tbody>
+                        <tbody id="tableBody" class="divide-y divide-slate-100 bg-white">
+                            <!-- Rows from JS -->
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
+        <!-- Content: Inventory -->
+        <div id="content-inventory" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Add Inventory Form -->
+                <div class="card p-6 shadow-sm h-fit">
+                    <h4 class="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v3m0 0v3m0-3h3m-3 0h-3m-9 3a9 9 0 1118 0 9 9 0 01-18 0z"/></svg>
+                        เพิ่มรายการยา/เวชภัณฑ์
+                    </h4>
+                    <form id="inventoryForm" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">ชื่อเรียกยา (Generic/Trade Name)</label>
+                            <input type="text" id="inv-name" class="form-input" placeholder="เช่น Paracetamol 500mg" required>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">จำนวนคงเหลือ</label>
+                                <input type="number" id="inv-stock" class="form-input" value="0" required>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">หน่วยนับ</label>
+                                <input type="text" id="inv-unit" class="form-input" placeholder="เม็ด/ขวด/แผง" required>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">ราคาทุน</label>
+                                <input type="number" id="inv-cost" class="form-input" step="0.01" value="0">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">ราคาขาย</label>
+                                <input type="number" id="inv-price" class="form-input" step="0.01" value="0">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">จุดแจ้งเตือนสต็อกต่ำ</label>
+                            <input type="number" id="inv-min" class="form-input" value="10">
+                        </div>
+                        <button type="submit" class="w-full btn-primary justify-center mt-2 py-3">
+                            เพิ่มเข้าคลังยา
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Inventory List -->
+                <div class="md:col-span-2 space-y-4">
+                    <div class="card overflow-hidden shadow-sm">
+                        <div class="p-4 bg-slate-50 border-b flex justify-between items-center">
+                            <h4 class="font-bold text-slate-700">รายการในคลังทั้งหมด</h4>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead class="table-header">
+                                    <tr>
+                                        <th class="px-4 py-3">ชื่อรายการ</th>
+                                        <th class="px-4 py-3 text-center">คงเหลือ</th>
+                                        <th class="px-4 py-3 text-right">ทุน/ขาย</th>
+                                        <th class="px-4 py-3 text-center">สถานะ</th>
+                                        <th class="px-4 py-3 text-center">จัดการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryBody" class="divide-y divide-slate-100">
+                                    <!-- Rows from JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- บัตรข้อมูลสำหรับ Export ข้อมูลทั้งหมด เป็น JPG (Hidden) -->
-    <div id="exportCard" class="bg-white">
+    <!-- Hidden Export Card (For JPG Generation) -->
+    <div id="exportCard">
         <div class="flex justify-between items-start border-b-4 border-emerald-600 pb-6 mb-8">
             <div>
-                <h1 class="text-4xl font-bold text-emerald-700 mb-1">เมทินีคลินิกการพยาบาล</h1>
-                <p class="text-lg text-gray-500">บันทึกข้อมูลการรับบริการและการรักษา</p>
+                <h1 class="text-4xl font-bold text-emerald-700 mb-1 uppercase tracking-tight">Metinee Clinic</h1>
+                <p class="text-lg text-slate-500 font-medium">Medical Record & Nursing Service</p>
             </div>
             <div class="text-right">
-                <p class="text-sm font-mono text-gray-400 uppercase tracking-widest mb-1">บันทึกเมื่อ</p>
+                <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">บันทึกเมื่อ</p>
                 <p id="ex-timestamp" class="text-xl font-bold text-slate-800"></p>
-                <div id="ex-hn-badge" class="mt-2 inline-block bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold"></div>
+                <div id="ex-hn-badge" class="mt-2 inline-block bg-emerald-100 text-emerald-700 px-4 py-1.5 rounded-xl font-black text-sm"></div>
             </div>
         </div>
 
-        <div class="grid grid-cols-3 gap-6 mb-8">
-            <div class="col-span-2 bg-slate-50 p-6 rounded-2xl border border-slate-100">
-                <p class="text-xs font-bold text-emerald-600 uppercase mb-2">ข้อมูลส่วนตัว</p>
-                <h2 id="ex-fullname" class="text-3xl font-bold text-slate-900 mb-2"></h2>
-                <div class="grid grid-cols-2 gap-4 text-slate-600">
-                    <p><strong>CID:</strong> <span id="ex-cid"></span></p>
-                    <p><strong>อายุ/เพศ:</strong> <span id="ex-age-gender"></span></p>
-                    <p><strong>เบอร์โทร:</strong> <span id="ex-phone"></span></p>
-                    <p><strong>สิทธิ:</strong> <span id="ex-right"></span></p>
+        <div class="grid grid-cols-3 gap-8 mb-8">
+            <div class="col-span-2 bg-slate-50 p-8 rounded-3xl border border-slate-100">
+                <p class="text-[10px] font-black text-emerald-600 uppercase mb-3 tracking-widest">ข้อมูลผู้รับบริการ</p>
+                <h2 id="ex-fullname" class="text-4xl font-black text-slate-900 mb-4"></h2>
+                <div class="grid grid-cols-2 gap-y-3 text-slate-600 font-medium">
+                    <p class="text-sm"><strong>CID:</strong> <span id="ex-cid" class="font-mono"></span></p>
+                    <p class="text-sm"><strong>อายุ/เพศ:</strong> <span id="ex-age-gender"></span></p>
+                    <p class="text-sm"><strong>โทร:</strong> <span id="ex-phone"></span></p>
+                    <p class="text-sm"><strong>สิทธิ:</strong> <span id="ex-right" class="text-emerald-700"></span></p>
                 </div>
             </div>
-            <div class="bg-emerald-600 p-6 rounded-2xl text-white flex flex-col justify-center items-center text-center">
-                <p class="text-xs font-bold uppercase opacity-80 mb-2">ค่าบริการสุทธิ</p>
-                <p id="ex-price" class="text-4xl font-bold"></p>
-                <p class="mt-1 text-sm opacity-90">บาท (รวม VAT)</p>
+            <div class="bg-emerald-600 p-8 rounded-3xl text-white flex flex-col justify-center items-center text-center shadow-xl shadow-emerald-100">
+                <p class="text-xs font-bold uppercase opacity-80 mb-2">Total Service Fee</p>
+                <p id="ex-price" class="text-5xl font-black tracking-tighter"></p>
+                <p class="mt-2 text-sm font-bold uppercase opacity-90">Thai Baht</p>
             </div>
         </div>
 
-        <div class="mb-8 p-6 bg-slate-50 rounded-2xl border border-slate-100">
-            <p class="text-xs font-bold text-emerald-600 uppercase mb-2">ที่อยู่ผู้รับบริการ</p>
-            <p id="ex-address" class="text-lg text-slate-700"></p>
+        <div class="mb-8 p-6 bg-slate-50 rounded-3xl border border-slate-100">
+            <p class="text-[10px] font-black text-emerald-600 uppercase mb-2 tracking-widest">Address Information</p>
+            <p id="ex-address" class="text-lg text-slate-700 font-medium"></p>
         </div>
 
-        <div class="grid grid-cols-1 gap-6 mb-8">
-            <div class="border-l-8 border-amber-400 bg-amber-50 p-6 rounded-r-2xl">
-                <h3 class="font-bold text-amber-800 mb-2 flex items-center gap-2">
-                    <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z"/></svg>
-                    อาการสำคัญ (Chief Complaint)
+        <div class="space-y-6">
+            <div class="border-l-[12px] border-orange-400 bg-orange-50/50 p-8 rounded-r-3xl">
+                <h3 class="font-black text-orange-900 mb-3 flex items-center gap-2 uppercase text-sm tracking-wider">
+                    Chief Complaint (อาการสำคัญ)
                 </h3>
-                <p id="ex-cc" class="text-xl text-slate-700 leading-relaxed"></p>
+                <p id="ex-cc" class="text-2xl text-slate-700 leading-relaxed font-semibold"></p>
             </div>
             <div class="grid grid-cols-2 gap-6">
-                <div class="border-l-8 border-blue-500 bg-blue-50 p-6 rounded-r-2xl">
-                    <h3 class="font-bold text-blue-800 mb-2">การวินิจฉัย (Diagnosis)</h3>
-                    <p id="ex-dx" class="text-lg text-slate-700"></p>
-                    <p class="mt-4 text-xs font-bold text-blue-400">BP: <span id="ex-bp" class="text-blue-700"></span></p>
+                <div class="border-l-[12px] border-blue-500 bg-blue-50/50 p-8 rounded-r-3xl">
+                    <h3 class="font-black text-blue-900 mb-3 uppercase text-sm tracking-wider">Diagnosis</h3>
+                    <p id="ex-dx" class="text-xl text-slate-700 font-medium"></p>
+                    <div class="mt-6 pt-4 border-t border-blue-200 flex justify-between items-center">
+                         <span class="text-xs font-black text-blue-400 uppercase">Vital Signs</span>
+                         <span class="text-xl font-black text-blue-700">BP: <span id="ex-bp"></span></span>
+                    </div>
                 </div>
-                <div class="border-l-8 border-emerald-500 bg-emerald-50 p-6 rounded-r-2xl">
-                    <h3 class="font-bold text-emerald-800 mb-2">การรักษา/สั่งยา (Treatment)</h3>
-                    <p id="ex-rx" class="text-lg text-slate-700"></p>
+                <div class="border-l-[12px] border-emerald-500 bg-emerald-50/50 p-8 rounded-r-3xl">
+                    <h3 class="font-black text-emerald-900 mb-3 uppercase text-sm tracking-wider">Treatment & Meds</h3>
+                    <p id="ex-rx" class="text-xl text-slate-700 font-medium"></p>
                 </div>
             </div>
         </div>
 
-        <div class="flex justify-between items-center mt-12 pt-6 border-t border-slate-100">
-            <div class="text-slate-400 text-sm italic">
-                * เอกสารนี้ใช้สำหรับบันทึกข้อมูลภายในคลินิกเท่านั้น
+        <div class="flex justify-between items-center mt-12 pt-8 border-t-2 border-slate-100">
+            <div class="text-slate-400 text-xs italic font-medium">
+                * บันทึกข้อมูลแบบอิเล็กทรอนิกส์ เมทินีคลินิก
             </div>
             <div class="text-right">
-                <p class="font-bold text-emerald-700">เมทินีคลินิกการพยาบาล</p>
-                <p class="text-xs text-slate-400">เลขที่ใบอนุญาต: XX-XXXXX-XXXX</p>
+                <p class="font-black text-emerald-700 text-xl">เมทินีคลินิกการพยาบาล</p>
+                <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-tighter">Nurse Clinic Professional System</p>
             </div>
         </div>
     </div>
 
-    <!-- Success Modal -->
-    <div id="successModal" class="fixed inset-0 bg-black/60 hidden flex items-center justify-center z-[100] p-4 backdrop-blur-sm">
-        <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl transform scale-95 transition-all duration-300">
+    <!-- Modals & Toasts -->
+    <div id="successModal" class="fixed inset-0 bg-slate-900/60 hidden flex items-center justify-center z-[100] p-4 backdrop-blur-md">
+        <div class="bg-white rounded-[2rem] max-w-lg w-full p-10 shadow-2xl transform scale-95 transition-all duration-300">
             <div class="text-center mb-8">
-                <div class="bg-emerald-100 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="h-12 w-12 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="bg-emerald-100 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <svg class="h-14 w-14 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                     </svg>
                 </div>
-                <h3 class="text-2xl font-bold text-slate-800">บันทึกข้อมูลสำเร็จแล้ว!</h3>
-                <p class="text-slate-500 mt-2">ข้อมูลผู้ป่วยถูกจัดเก็บในฐานข้อมูลเรียบร้อยแล้ว</p>
+                <h3 class="text-3xl font-black text-slate-800">บันทึกเรียบร้อย!</h3>
             </div>
-            
-            <div class="grid grid-cols-1 gap-3">
-                <button onclick="exportCurrentPatientJPG()" class="group w-full py-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 flex items-center justify-center gap-3 transition-all shadow-xl shadow-emerald-200">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 group-hover:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Export ข้อมูลทั้งหมดเป็นรูปภาพ (.JPG)
+            <div class="space-y-3">
+                <button onclick="exportCurrentPatientJPG()" class="w-full py-4 bg-emerald-600 text-white rounded-2xl font-black hover:bg-emerald-700 flex items-center justify-center gap-3 transition-all shadow-xl shadow-emerald-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    ดาวน์โหลดบัตรบันทึก (.JPG)
                 </button>
-                <button onclick="closeModal()" class="w-full py-4 bg-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-slate-200 transition">
-                    ตกลงและกลับหน้าหลัก
+                <button onclick="closeModal()" class="w-full py-4 text-slate-400 font-bold hover:text-slate-600 transition">
+                    กลับหน้าหลัก
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 right-5 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-800 text-white px-6 py-4 rounded-2xl shadow-2xl z-[110] flex items-center gap-3">
-        <span id="toastIcon">✅</span> <span id="toastMsg" class="font-medium"></span>
+    <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 transform translate-y-20 opacity-0 transition-all duration-500 bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl z-[110] flex items-center gap-3">
+        <span id="toastIcon" class="text-2xl">✅</span> 
+        <span id="toastMsg" class="font-bold"></span>
     </div>
 
     <script>
+        // --- State Management ---
         let patients = JSON.parse(localStorage.getItem('clinic_patients')) || [];
+        let inventory = JSON.parse(localStorage.getItem('clinic_inventory')) || [
+            { id: 1, name: 'Paracetamol 500mg', stock: 100, unit: 'เม็ด', cost: 0.5, price: 2, min: 20 },
+            { id: 2, name: 'Amoxicillin 500mg', stock: 50, unit: 'เม็ด', cost: 2, price: 5, min: 15 }
+        ];
         let lastRegisteredPatient = null;
         let weeklyChart, rightsChart;
 
+        // --- Core Functions ---
         function updateDateTime() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('th-TH');
@@ -339,179 +470,6 @@
         }
         setInterval(updateDateTime, 1000);
         updateDateTime();
-
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById('content-' + tabId).classList.remove('hidden');
-            document.getElementById('tab-' + tabId).classList.add('active');
-            if(tabId === 'overview') updateCharts();
-            if(tabId === 'database') renderTable();
-        }
-
-        document.getElementById('patientForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const newPatient = {
-                id: Date.now(),
-                timestamp: new Date().toLocaleString('th-TH'),
-                date: new Date().toISOString().split('T')[0],
-                fullname: document.getElementById('fullname').value,
-                cid: document.getElementById('cid').value || '-',
-                hn: document.getElementById('hn').value || 'ไม่มี HN',
-                addr_house: document.getElementById('addr_house').value || '',
-                addr_tambon: document.getElementById('addr_tambon').value || '',
-                addr_amphoe: document.getElementById('addr_amphoe').value || '',
-                addr_province: document.getElementById('addr_province').value || '',
-                phone: document.getElementById('phone').value || '',
-                right: document.getElementById('right').value,
-                age: document.getElementById('age').value || '-',
-                gender: document.getElementById('gender').value,
-                bp: document.getElementById('bp').value || '-',
-                price: parseFloat(document.getElementById('price').value) || 0,
-                cc: document.getElementById('cc').value,
-                dx: document.getElementById('dx').value,
-                rx: document.getElementById('rx').value
-            };
-            
-            patients.unshift(newPatient);
-            lastRegisteredPatient = newPatient;
-            saveAndRefresh();
-            this.reset();
-            
-            const modal = document.getElementById('successModal');
-            modal.classList.remove('hidden');
-            setTimeout(() => modal.querySelector('div').classList.remove('scale-95'), 10);
-        });
-
-        function closeModal() {
-            const modal = document.getElementById('successModal');
-            modal.querySelector('div').classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-                switchTab('database');
-            }, 200);
-        }
-
-        function exportCurrentPatientJPG() {
-            if (!lastRegisteredPatient) return;
-            const p = lastRegisteredPatient;
-            
-            // Map ข้อมูลลงใน Export Card
-            document.getElementById('ex-timestamp').innerText = p.timestamp;
-            document.getElementById('ex-hn-badge').innerText = `HN: ${p.hn}`;
-            document.getElementById('ex-fullname').innerText = p.fullname;
-            document.getElementById('ex-cid').innerText = p.cid;
-            document.getElementById('ex-age-gender').innerText = `${p.age} ปี / ${p.gender}`;
-            document.getElementById('ex-phone').innerText = p.phone || '-';
-            document.getElementById('ex-right').innerText = p.right;
-            document.getElementById('ex-price').innerText = p.price.toLocaleString();
-            document.getElementById('ex-address').innerText = `${p.addr_house} ต.${p.addr_tambon} อ.${p.addr_amphoe} จ.${p.addr_province}`;
-            document.getElementById('ex-cc').innerText = p.cc || '-';
-            document.getElementById('ex-dx').innerText = p.dx || '-';
-            document.getElementById('ex-bp').innerText = p.bp;
-            document.getElementById('ex-rx').innerText = p.rx || '-';
-
-            const element = document.getElementById('exportCard');
-            
-            html2canvas(element, {
-                scale: 2,
-                backgroundColor: "#ffffff",
-                logging: false
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `บันทึกคนไข้_${p.fullname.replace(/\s+/g, '_')}_${p.date}.jpg`;
-                link.href = canvas.toDataURL('image/jpeg', 0.9);
-                link.click();
-                showToast("ส่งออกข้อมูลสำเร็จแล้ว", "🖼️");
-            });
-        }
-
-        function saveAndRefresh() {
-            localStorage.setItem('clinic_patients', JSON.stringify(patients));
-            updateStats();
-            if(!document.getElementById('content-overview').classList.contains('hidden')) updateCharts();
-            if(!document.getElementById('content-database').classList.contains('hidden')) renderTable();
-        }
-
-        function updateStats() {
-            const today = new Date().toISOString().split('T')[0];
-            const patientsToday = patients.filter(p => p.date === today);
-            const incomeToday = patientsToday.reduce((sum, p) => sum + p.price, 0);
-            
-            document.getElementById('stat-today').innerText = patientsToday.length;
-            document.getElementById('stat-total').innerText = patients.length;
-            document.getElementById('stat-income-today').innerText = incomeToday.toLocaleString();
-            document.getElementById('stat-gold').innerText = patients.filter(p => p.right === 'บัตรทอง').length;
-        }
-
-        function renderTable() {
-            const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '';
-            patients.forEach(p => {
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-50 transition-colors";
-                row.innerHTML = `
-                    <td class="px-4 py-4 text-[10px] text-gray-500 font-mono">${p.timestamp}</td>
-                    <td class="px-4 py-4">
-                        <div class="font-bold text-slate-800 text-sm">${p.fullname}</div>
-                        <div class="text-[10px] text-gray-400">HN: ${p.hn} | CID: ${p.cid}</div>
-                    </td>
-                    <td class="px-4 py-4 text-xs text-slate-600 italic truncate max-w-[150px]">${p.cc || '-'}</td>
-                    <td class="px-4 py-4">
-                        <div class="text-[10px] font-bold text-blue-600">DX: ${p.dx || '-'}</div>
-                        <div class="text-[10px] text-emerald-700">RX: ${p.rx || '-'}</div>
-                    </td>
-                    <td class="px-4 py-4">
-                        <div class="text-sm font-bold text-emerald-700">${p.price.toLocaleString()} ฿</div>
-                        <div class="text-[9px] text-gray-400 font-bold uppercase">${p.right}</div>
-                    </td>
-                    <td class="px-4 py-4 text-center">
-                        <button onclick="deletePatient(${p.id})" class="text-xs text-red-400 hover:text-red-600 font-bold">ลบ</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        function deletePatient(id) {
-            if(confirm("ต้องการลบข้อมูลนี้ใช่หรือไม่?")) {
-                patients = patients.filter(p => p.id !== id);
-                saveAndRefresh();
-                showToast("ลบข้อมูลสำเร็จ", "🗑️");
-            }
-        }
-
-        function filterTable() {
-            const q = document.getElementById('searchInput').value.toLowerCase();
-            document.querySelectorAll('#tableBody tr').forEach(row => {
-                row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
-            });
-        }
-
-        function updateCharts() {
-            const ctxW = document.getElementById('weeklyChart').getContext('2d');
-            const last7 = [...Array(7)].map((_, i) => {
-                const d = new Date(); d.setDate(d.getDate() - (6 - i));
-                return d.toISOString().split('T')[0];
-            });
-            const wData = last7.map(d => patients.filter(p => p.date === d).length);
-            if(weeklyChart) weeklyChart.destroy();
-            weeklyChart = new Chart(ctxW, {
-                type: 'line',
-                data: {
-                    labels: last7.map(d => new Date(d).toLocaleDateString('th-TH', {day:'numeric', month:'short'})),
-                    datasets: [{ label: 'จำนวนผู้ป่วย', data: wData, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.4 }]
-                }
-            });
-
-            const rMap = { 'จ่ายเงินเอง': 0, 'บัตรทอง': 0, 'ข้าราชการ': 0, 'ประกันสังคม': 0 };
-            patients.forEach(p => { if(rMap[p.right] !== undefined) rMap[p.right]++; });
-            if(rightsChart) rightsChart.destroy();
-            rightsChart = new Chart(document.getElementById('rightsChart').getContext('2d'), {
-                type: 'doughnut',
-                data: { labels: Object.keys(rMap), datasets: [{ data: Object.values(rMap), backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#8b5cf6'] }] }
-            });
-        }
 
         function showToast(msg, icon = "✅") {
             const t = document.getElementById('toast');
@@ -521,22 +479,254 @@
             setTimeout(() => t.classList.add('translate-y-20', 'opacity-0'), 3000);
         }
 
-        function exportToCSV() {
-            if(patients.length === 0) return;
-            const h = ["วันเวลา", "CID", "HN", "ชื่อ-สกุล", "เบอร์โทร", "ที่อยู่", "สิทธิ", "ค่าบริการ", "CC", "วินิจฉัย", "การรักษา"];
-            const r = patients.map(p => [p.timestamp, p.cid, p.hn, p.fullname, p.phone, `${p.addr_house} ${p.addr_tambon}`, p.right, p.price, p.cc, p.dx, p.rx]);
-            let csv = "\uFEFF" + h.join(",") + "\n";
-            r.forEach(row => { csv += row.map(c => `"${(c || '').toString().replace(/"/g, '""')}"`).join(",") + "\n"; });
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = `เมทินีคลินิก_${new Date().toLocaleDateString('th-TH').replace(/\//g,'-')}.csv`;
-            link.click();
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('content-' + tabId).classList.remove('hidden');
+            document.getElementById('tab-' + tabId).classList.add('active');
+            
+            if(tabId === 'overview') updateOverview();
+            if(tabId === 'database') renderTable();
+            if(tabId === 'inventory') renderInventory();
+            if(tabId === 'entry') renderMedSelection();
         }
 
-        updateStats();
-        updateCharts();
+        // --- Inventory Logic ---
+        function renderMedSelection() {
+            const container = document.getElementById('med-selection-container');
+            container.innerHTML = inventory.length ? '' : '<p class="text-xs text-slate-400 italic">ไม่มีรายการยา</p>';
+            inventory.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "flex items-center justify-between p-2 hover:bg-white rounded-lg transition-colors border border-transparent";
+                div.innerHTML = `
+                    <div class="flex flex-col">
+                        <span class="text-xs font-bold text-slate-700">${item.name}</span>
+                        <span class="text-[9px] text-slate-400">สต็อก: ${item.stock} ${item.unit} | ${item.price}฿</span>
+                    </div>
+                    <input type="number" data-id="${item.id}" data-price="${item.price}" class="med-qty-input w-12 text-center text-xs p-1 border rounded" value="0" min="0" onchange="calculateAutoPrice()">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function calculateAutoPrice() {
+            let total = 0;
+            document.querySelectorAll('.med-qty-input').forEach(input => {
+                const qty = parseInt(input.value) || 0;
+                total += (qty * (parseFloat(input.getAttribute('data-price')) || 0));
+            });
+            document.getElementById('price').value = total;
+        }
+
+        function renderInventory() {
+            const tbody = document.getElementById('inventoryBody');
+            tbody.innerHTML = '';
+            inventory.forEach(item => {
+                const isLow = item.stock <= item.min;
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50 transition-colors";
+                row.innerHTML = `
+                    <td class="px-4 py-4"><div class="font-bold text-slate-800 text-sm">${item.name}</div></td>
+                    <td class="px-4 py-4 text-center font-mono font-bold ${isLow ? 'text-red-500' : 'text-slate-700'}">${item.stock}</td>
+                    <td class="px-4 py-4 text-right">
+                        <div class="text-[10px] text-slate-400">ทุน ${item.cost}</div>
+                        <div class="text-sm font-black text-emerald-600">ขาย ${item.price}</div>
+                    </td>
+                    <td class="px-4 py-4 text-center"><span class="${isLow ? 'badge-low' : 'badge-ok'}">${isLow ? 'LOW' : 'OK'}</span></td>
+                    <td class="px-4 py-4 text-center">
+                        <button onclick="deleteInventory(${item.id})" class="text-slate-300 hover:text-red-500 transition-colors">ลบ</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        document.getElementById('inventoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            inventory.push({
+                id: Date.now(),
+                name: document.getElementById('inv-name').value,
+                stock: parseInt(document.getElementById('inv-stock').value),
+                unit: document.getElementById('inv-unit').value,
+                cost: parseFloat(document.getElementById('inv-cost').value),
+                price: parseFloat(document.getElementById('inv-price').value),
+                min: parseInt(document.getElementById('inv-min').value)
+            });
+            localStorage.setItem('clinic_inventory', JSON.stringify(inventory));
+            this.reset();
+            renderInventory();
+            showToast("เพิ่มยาสำเร็จ", "📦");
+        });
+
+        // --- Patient Logic ---
+        document.getElementById('patientForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let medsUsed = [];
+            document.querySelectorAll('.med-qty-input').forEach(input => {
+                const qty = parseInt(input.value) || 0;
+                if(qty > 0) {
+                    const medId = parseInt(input.getAttribute('data-id'));
+                    const med = inventory.find(i => i.id === medId);
+                    if(med) { med.stock -= qty; medsUsed.push(`${med.name} x ${qty}`); }
+                }
+            });
+
+            const newPatient = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('th-TH'),
+                date: new Date().toISOString().split('T')[0],
+                fullname: document.getElementById('fullname').value,
+                cid: document.getElementById('cid').value || '-',
+                hn: document.getElementById('hn').value || 'N/A',
+                addr_house: document.getElementById('addr_house').value || '',
+                addr_tambon: document.getElementById('addr_tambon').value || '',
+                addr_amphoe: document.getElementById('addr_amphoe').value || '',
+                addr_province: document.getElementById('addr_province').value || '',
+                phone: document.getElementById('phone').value || '-',
+                right: document.getElementById('right').value,
+                age: document.getElementById('age').value || '-',
+                gender: document.getElementById('gender').value,
+                bp: document.getElementById('bp').value || '-',
+                price: parseFloat(document.getElementById('price').value) || 0,
+                cc: document.getElementById('cc').value,
+                dx: document.getElementById('dx').value,
+                rx: medsUsed.length ? "จ่ายยา: " + medsUsed.join(", ") : "-"
+            };
+            
+            patients.unshift(newPatient);
+            lastRegisteredPatient = newPatient;
+            localStorage.setItem('clinic_patients', JSON.stringify(patients));
+            localStorage.setItem('clinic_inventory', JSON.stringify(inventory));
+            
+            this.reset();
+            document.getElementById('successModal').classList.remove('hidden');
+        });
+
+        function closeModal() {
+            document.getElementById('successModal').classList.add('hidden');
+            switchTab('database');
+        }
+
+        // --- EXPORT JPG LOGIC ---
+        function exportPatientDataToJPG(patientObj) {
+            const p = patientObj;
+            document.getElementById('ex-timestamp').innerText = p.timestamp;
+            document.getElementById('ex-hn-badge').innerText = `HN: ${p.hn}`;
+            document.getElementById('ex-fullname').innerText = p.fullname;
+            document.getElementById('ex-cid').innerText = p.cid;
+            document.getElementById('ex-age-gender').innerText = `${p.age} ปี / ${p.gender}`;
+            document.getElementById('ex-phone').innerText = p.phone;
+            document.getElementById('ex-right').innerText = p.right;
+            document.getElementById('ex-price').innerText = p.price.toLocaleString();
+            document.getElementById('ex-address').innerText = `${p.addr_house} ต.${p.addr_tambon} อ.${p.addr_amphoe} จ.${p.addr_province}`;
+            document.getElementById('ex-cc').innerText = p.cc || '-';
+            document.getElementById('ex-dx').innerText = p.dx || '-';
+            document.getElementById('ex-bp').innerText = p.bp;
+            document.getElementById('ex-rx').innerText = p.rx || '-';
+
+            const element = document.getElementById('exportCard');
+            html2canvas(element, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Metinee_Record_${p.fullname.replace(/\s+/g, '_')}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                showToast("ดาวน์โหลด JPG เรียบร้อย", "🖼️");
+            });
+        }
+
+        function exportCurrentPatientJPG() {
+            if (lastRegisteredPatient) exportPatientDataToJPG(lastRegisteredPatient);
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            patients.forEach(p => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-50/80 transition-colors group";
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        <div class="text-[10px] font-black text-slate-400 font-mono">${p.timestamp}</div>
+                        <div class="mt-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 rounded inline-block">HN: ${p.hn}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="font-black text-slate-800 text-base">${p.fullname}</div>
+                        <div class="text-xs text-slate-500">${p.age} ปี | CID: ${p.cid}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-xs text-slate-600 font-bold line-clamp-1 italic">CC: ${p.cc || '-'}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-lg font-black text-slate-800">${p.price.toLocaleString()} ฿</div>
+                        <div class="text-[10px] font-black text-slate-400 uppercase tracking-tighter">${p.right}</div>
+                    </td>
+                    <td class="px-6 py-4 text-center space-x-2">
+                        <button onclick='exportPatientDataToJPG(${JSON.stringify(p)})' class="p-2 hover:bg-emerald-50 rounded-lg text-emerald-600 transition-colors" title="Export JPG">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        </button>
+                        <button onclick="deletePatient(${p.id})" class="p-2 hover:bg-red-50 rounded-lg text-red-300 hover:text-red-500 transition-colors" title="ลบ">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // --- Statistics & Charts ---
+        function updateOverview() {
+            const today = new Date().toISOString().split('T')[0];
+            const pToday = patients.filter(p => p.date === today);
+            const income = pToday.reduce((sum, p) => sum + p.price, 0);
+            const lowCount = inventory.filter(i => i.stock <= i.min).length;
+            const invTotalVal = inventory.reduce((sum, i) => sum + (i.stock * i.cost), 0);
+            
+            document.getElementById('stat-today').innerText = pToday.length;
+            document.getElementById('stat-income-today').innerText = income.toLocaleString();
+            document.getElementById('stat-low-stock').innerText = lowCount;
+            document.getElementById('stat-inventory-val').innerText = Math.round(invTotalVal).toLocaleString();
+
+            updateCharts();
+        }
+
+        function updateCharts() {
+            const ctxW = document.getElementById('weeklyChart').getContext('2d');
+            const last7Days = [...Array(7)].map((_, i) => {
+                const d = new Date(); d.setDate(d.getDate() - (6 - i));
+                return d.toISOString().split('T')[0];
+            });
+            const dataW = last7Days.map(d => patients.filter(p => p.date === d).length);
+            
+            if(weeklyChart) weeklyChart.destroy();
+            weeklyChart = new Chart(ctxW, {
+                type: 'line',
+                data: {
+                    labels: last7Days.map(d => new Date(d).toLocaleDateString('th-TH', {day:'numeric', month:'short'})),
+                    datasets: [{ data: dataW, borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, 0.1)', fill: true, tension: 0.4 }]
+                },
+                options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        function filterTable() {
+            const q = document.getElementById('searchInput').value.toLowerCase();
+            document.querySelectorAll('#tableBody tr').forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
+        function exportToCSV() {
+            if(!patients.length) return;
+            const rows = patients.map(p => [p.timestamp, p.cid, p.hn, p.fullname, p.right, p.price, p.cc, p.dx, p.rx]);
+            let csv = "\uFEFFวันเวลา,CID,HN,ชื่อ,สิทธิ,ราคา,CC,DX,RX\n";
+            rows.forEach(r => csv += r.map(c => `"${c.toString().replace(/"/g, '""')}"`).join(",") + "\n");
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+            link.download = "Patient_History.csv"; link.click();
+        }
+
+        // Init
+        updateOverview();
     </script>
 </body>
 </html>
-
